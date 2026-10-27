@@ -72,3 +72,10 @@ server/test.js
 # ==========================================
 coverage/
 .nyc_output/
+
+# ==========================================
+# Internal Documentation & Reports
+# ==========================================
+FINAL_PROJECT_REPORT.md
+PROJECT_DESCRIPTION.md
+
