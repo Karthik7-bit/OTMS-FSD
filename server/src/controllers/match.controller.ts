@@ -127,7 +127,13 @@ export const allocateMatch = async (req: any, res: Response) => {
     const { id } = req.params;
 
     const match = await prisma.match.findUnique({ where: { id: id } });
-    if (!match) return res.status(404).json({ success: false, message: 'Match not found' });
+    if (!match) return res.status(404).json({ success: false, message: 'Match record not found' });
+
+    if (match.status === 'ACCEPTED') {
+      return res.status(400).json({ success: false, message: 'This match has already been authorized and allocated.' });
+    }
+
+    const doctorUserId = req.user.id || req.user.userId;
 
     // Perform the allocation inside a transaction to ensure data integrity
     await prisma.$transaction(async (tx) => {
@@ -167,11 +173,23 @@ export const allocateMatch = async (req: any, res: Response) => {
         where: { id: match.recipientId },
         data: { status: 'MATCHED' }
       });
+
+      // 6. Create formal Allocation audit record
+      await tx.allocation.create({
+        data: {
+          organId: match.organId,
+          recipientId: match.recipientId,
+          approvedBy: doctorUserId,
+          approvalStatus: 'APPROVED',
+          allocationDate: new Date(),
+          notes: `Clinically authorized allocation via OTMS Matching Engine (Score: ${match.compatibilityScore}).`
+        }
+      });
     });
 
-    return res.json({ success: true, message: 'Organ successfully allocated to patient.' });
+    return res.json({ success: true, message: 'Organ successfully authorized and allocated to recipient.' });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ success: false, message: 'Server error during allocation' });
+    return res.status(500).json({ success: false, message: 'Server error during allocation processing' });
   }
 };
