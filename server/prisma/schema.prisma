@@ -1,0 +1,279 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  DOCTOR
+  DONOR
+  RECIPIENT
+}
+
+enum OrganType {
+  KIDNEY
+  LIVER
+  HEART
+  LUNG
+  PANCREAS
+  INTESTINE
+}
+
+enum BloodGroup {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
+}
+
+enum OrganStatus {
+  AVAILABLE
+  RESERVED
+  ALLOCATED
+  TRANSPLANTED
+  EXPIRED
+}
+
+enum RequestStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  MATCHED
+  ALLOCATED
+  COMPLETED
+  CANCELLED
+}
+
+enum MatchStatus {
+  PENDING
+  REVIEWED
+  ACCEPTED
+  REJECTED
+}
+
+enum AllocationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+enum TransplantStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  fullName     String
+  email        String   @unique
+  phone        String
+  passwordHash String
+  role         Role
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  donor        Donor?
+  recipient    Recipient?
+  doctor       Doctor?
+
+  notifications Notification[]
+  auditLogs     AuditLog[]
+}
+
+model Donor {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId        @unique
+  user          User       @relation(fields: [userId], references: [id])
+  dateOfBirth   DateTime
+  gender        String
+  bloodGroup    BloodGroup
+  city          String
+  address       String
+  medicalStatus String
+  consentStatus Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  organs        Organ[]
+}
+
+model Recipient {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId           @unique
+  user            User          @relation(fields: [userId], references: [id])
+  dateOfBirth     DateTime
+  gender          String
+  bloodGroup      BloodGroup
+  city            String
+  address         String
+  medicalCondition String
+  urgencyLevel    Int
+  medicalPriority Int
+  waitingSince    DateTime      @default(now())
+  status          String        @default("ACTIVE") // ACTIVE, MATCHED, TRANSPLANTED, INACTIVE
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  transplantRequests TransplantRequest[]
+  matches            Match[]
+  allocations        Allocation[]
+  transplants        Transplant[]
+}
+
+model Doctor {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId        @unique
+  user           User       @relation(fields: [userId], references: [id])
+  hospitalId String @db.ObjectId
+  hospital       Hospital   @relation(fields: [hospitalId], references: [id])
+  specialization String
+  licenseNumber  String     @unique
+  status         String     @default("ACTIVE")
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  transplants    Transplant[]
+}
+
+model Hospital {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  address   String
+  city      String
+  phone     String
+  email     String
+  status    String   @default("ACTIVE")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  doctors            Doctor[]
+  organs             Organ[]
+  transplantRequests TransplantRequest[]
+  transplants        Transplant[]
+}
+
+model Organ {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  donorId String @db.ObjectId
+  donor              Donor       @relation(fields: [donorId], references: [id])
+  hospitalId String @db.ObjectId
+  hospital           Hospital    @relation(fields: [hospitalId], references: [id])
+  organType          OrganType
+  bloodGroup         BloodGroup
+  location           String
+  availabilityStatus OrganStatus @default(AVAILABLE)
+  retrievalDate      DateTime
+  expiryDate         DateTime
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  matches     Match[]
+  allocations Allocation[]
+  transplants Transplant[]
+}
+
+model TransplantRequest {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  recipientId String @db.ObjectId
+  recipient          Recipient     @relation(fields: [recipientId], references: [id])
+  organType          OrganType
+  hospitalId String @db.ObjectId
+  hospital           Hospital      @relation(fields: [hospitalId], references: [id])
+  urgencyLevel       Int
+  medicalPriority    Int
+  medicalInformation String
+  status             RequestStatus @default(PENDING)
+  requestDate        DateTime      @default(now())
+  reviewedBy String? @db.ObjectId
+  reviewedAt         DateTime?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+}
+
+model Match {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  organId String @db.ObjectId
+  organ                Organ       @relation(fields: [organId], references: [id])
+  recipientId String @db.ObjectId
+  recipient            Recipient   @relation(fields: [recipientId], references: [id])
+  compatibilityScore   Float
+  bloodGroupScore      Float
+  organTypeScore       Float
+  urgencyScore         Float
+  medicalPriorityScore Float
+  waitingTimeScore     Float
+  locationScore        Float
+  status               MatchStatus @default(PENDING)
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+}
+
+model Allocation {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  organId String @db.ObjectId
+  organ          Organ            @relation(fields: [organId], references: [id])
+  recipientId String @db.ObjectId
+  recipient      Recipient        @relation(fields: [recipientId], references: [id])
+  approvedBy String? @db.ObjectId
+  approvalStatus AllocationStatus @default(PENDING)
+  allocationDate DateTime?
+  notes          String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  transplants Transplant[]
+}
+
+model Transplant {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  allocationId String @db.ObjectId
+  allocation     Allocation       @relation(fields: [allocationId], references: [id])
+  recipientId String @db.ObjectId
+  recipient      Recipient        @relation(fields: [recipientId], references: [id])
+  organId String @db.ObjectId
+  organ          Organ            @relation(fields: [organId], references: [id])
+  hospitalId String @db.ObjectId
+  hospital       Hospital         @relation(fields: [hospitalId], references: [id])
+  doctorId String @db.ObjectId
+  doctor         Doctor           @relation(fields: [doctorId], references: [id])
+  transplantDate DateTime?
+  status         TransplantStatus @default(SCHEDULED)
+  notes          String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model Notification {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  type      String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String? @db.ObjectId
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  entity    String
+  entityId String? @db.ObjectId
+  details   String
+  createdAt DateTime @default(now())
+}

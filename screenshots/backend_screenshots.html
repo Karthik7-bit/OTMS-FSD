@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Backend Screenshots</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 50px;
+    }
+    .card {
+      background: #1e293b;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+      border: 1px solid #334155;
+      width: 1000px;
+      margin: 0 auto;
+    }
+    .window-header {
+      background: #0f172a;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid #334155;
+    }
+    .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+    .dot-red { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green { background: #10b981; }
+    .window-title {
+      color: #94a3b8;
+      font-size: 13px;
+      font-family: monospace;
+      margin-left: 12px;
+      font-weight: 600;
+    }
+    .badge {
+      margin-left: auto;
+      background: #2563eb;
+      color: white;
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .badge-post { background: #10b981; }
+    .terminal-body {
+      padding: 24px;
+      font-family: "JetBrains Mono", "Cascadia Code", Consolas, "Courier New", monospace;
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: #f1f5f9;
+      background: #0b1120;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+    .prompt { color: #38bdf8; font-weight: bold; }
+    .command { color: #f8fafc; font-weight: 600; }
+    .comment { color: #64748b; font-style: italic; }
+    .status-up { color: #4ade80; font-weight: bold; }
+    .key { color: #7dd3fc; }
+    .string { color: #86efac; }
+    .number { color: #fde047; }
+    .boolean { color: #f472b6; }
+    .token { color: #c084fc; word-break: break-all; }
+  </style>
+</head>
+<body>
+
+  <!-- 1. docker compose ps -->
+  <div id="shot-1" class="card">
+    <div class="window-header">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span class="window-title">bash &mdash; docker compose ps</span>
+      <span class="badge">DOCKER ORCHESTRATION</span>
+    </div>
+    <div class="terminal-body"><span class="prompt">$</span> <span class="command">docker compose ps</span>
+
+<span class="comment">NAME          IMAGE                              COMMAND                  SERVICE   STATUS                 PORTS</span>
+<span class="key">otms-client</span>   organtransplantmanagement-client   "docker-entrypoint.s…"   client    <span class="status-up">Up 2 hours</span>             0.0.0.0:5173->5173/tcp
+<span class="key">otms-mongo</span>    mongo:6                            "docker-entrypoint.s…"   mongo     <span class="status-up">Up 3 hours (healthy)</span>   0.0.0.0:27017->27017/tcp
+<span class="key">otms-redis</span>    redis:7-alpine                     "docker-entrypoint.s…"   redis     <span class="status-up">Up 3 hours</span>             0.0.0.0:6379->6379/tcp
+<span class="key">otms-server</span>   organtransplantmanagement-server   "docker-entrypoint.s…"   server    <span class="status-up">Up 2 hours</span>             0.0.0.0:5000->5000/tcp
+</div>
+  </div>
+
+  <!-- 2. POST /api/auth/login response (JWT) -->
+  <div id="shot-2" class="card">
+    <div class="window-header">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span class="window-title">POST /api/auth/login &mdash; HTTP 200 OK</span>
+      <span class="badge badge-post">POST (JWT AUTH)</span>
+    </div>
+    <div class="terminal-body"><span class="prompt">&gt;</span> <span class="command">POST http://localhost:5000/api/auth/login</span>
+<span class="comment">Content-Type: application/json
+{ "email": "admin@otms.com", "password": "••••••••" }</span>
+
+<span class="prompt">&lt;</span> <span class="status-up">HTTP/1.1 200 OK</span>
+{
+  <span class="key">"success"</span>: <span class="boolean">true</span>,
+  <span class="key">"message"</span>: <span class="string">"Login successful"</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"token"</span>: <span class="token">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2YWM5MWRhMDM0NzMyZjNhYThmNDBiNGYiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3OTE1NzQ4NjMsImV4cCI6MTc5MTY2MTI2M30.QwpPdasyFaY6d5FZ7kR-4BUTEVrdJQXtpqSHh-2MMUU"</span>,
+    <span class="key">"user"</span>: {
+      <span class="key">"id"</span>: <span class="string">"6ac91da034732f3aa8f40b4f"</span>,
+      <span class="key">"email"</span>: <span class="string">"admin@otms.com"</span>,
+      <span class="key">"fullName"</span>: <span class="string">"System Administrator"</span>,
+      <span class="key">"role"</span>: <span class="string">"ADMIN"</span>
+    }
+  }
+}</div>
+  </div>
+
+  <!-- 3. POST /api/matches/run response (JSON) -->
+  <div id="shot-3" class="card">
+    <div class="window-header">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span class="window-title">POST /api/matches/run &mdash; HTTP 200 OK</span>
+      <span class="badge badge-post">MATCHING ENGINE</span>
+    </div>
+    <div class="terminal-body"><span class="prompt">&gt;</span> <span class="command">POST http://localhost:5000/api/matches/run</span>
+<span class="comment">Authorization: Bearer eyJhbGciOiJIUzI1Ni...
+Content-Type: application/json
+{ "organId": "6ac91f79eb7fc80e0f4773a7" }</span>
+
+<span class="prompt">&lt;</span> <span class="status-up">HTTP/1.1 200 OK</span>
+{
+  <span class="key">"success"</span>: <span class="boolean">true</span>,
+  <span class="key">"message"</span>: <span class="string">"Found 2 potential matches"</span>,
+  <span class="key">"data"</span>: [
+    {
+      <span class="key">"id"</span>: <span class="string">"6ac94359bab37bc669005a90"</span>,
+      <span class="key">"organId"</span>: <span class="string">"6ac91f79eb7fc80e0f4773a7"</span>,
+      <span class="key">"recipientId"</span>: <span class="string">"6ac91da39d58d620fde02cb9"</span>,
+      <span class="key">"compatibilityScore"</span>: <span class="number">77</span>,
+      <span class="key">"bloodGroupScore"</span>: <span class="number">35</span>,
+      <span class="key">"urgencyScore"</span>: <span class="number">24</span>,
+      <span class="key">"medicalPriorityScore"</span>: <span class="number">18</span>,
+      <span class="key">"status"</span>: <span class="string">"PENDING"</span>
+    },
+    {
+      <span class="key">"id"</span>: <span class="string">"6ac94359bab37bc669005a8f"</span>,
+      <span class="key">"organId"</span>: <span class="string">"6ac91f79eb7fc80e0f4773a7"</span>,
+      <span class="key">"recipientId"</span>: <span class="string">"6ac91da39d58d620fde02cc2"</span>,
+      <span class="key">"compatibilityScore"</span>: <span class="number">60</span>,
+      <span class="key">"bloodGroupScore"</span>: <span class="number">35</span>,
+      <span class="key">"urgencyScore"</span>: <span class="number">15</span>,
+      <span class="key">"medicalPriorityScore"</span>: <span class="number">10</span>,
+      <span class="key">"status"</span>: <span class="string">"PENDING"</span>
+    }
+  ]
+}</div>
+  </div>
+
+  <!-- 4. POST /api/matches/:id/allocate response -->
+  <div id="shot-4" class="card">
+    <div class="window-header">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span class="window-title">POST /api/matches/6ac94359bab37bc669005a90/allocate &mdash; HTTP 200 OK</span>
+      <span class="badge badge-post">TRANSACTION ALLOCATION</span>
+    </div>
+    <div class="terminal-body"><span class="prompt">&gt;</span> <span class="command">POST http://localhost:5000/api/matches/6ac94359bab37bc669005a90/allocate</span>
+<span class="comment">Authorization: Bearer eyJhbGciOiJIUzI1Ni...
+Accept: application/json</span>
+
+<span class="prompt">&lt;</span> <span class="status-up">HTTP/1.1 200 OK</span>
+{
+  <span class="key">"success"</span>: <span class="boolean">true</span>,
+  <span class="key">"message"</span>: <span class="string">"Organ successfully allocated to patient."</span>
+}</div>
+  </div>
+
+</body>
+</html>

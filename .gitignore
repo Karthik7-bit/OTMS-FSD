@@ -1,0 +1,74 @@
+# ==========================================
+# Dependencies
+# ==========================================
+node_modules/
+*/node_modules/
+**/node_modules/
+
+# ==========================================
+# Environment Variables & Secrets (CRITICAL)
+# ==========================================
+.env
+.env.*
+*.env
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+*.cert
+*.pfx
+*.credentials
+
+# ==========================================
+# Production Builds & Compiled Outputs
+# ==========================================
+dist/
+build/
+dist-ssr/
+*.local
+out/
+
+# ==========================================
+# Logs & Temporary Files
+# ==========================================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+*.tmp
+
+# ==========================================
+# OS & IDE Files
+# ==========================================
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ==========================================
+# AI Assistant & Migration Scratch Scripts
+# ==========================================
+.agents/
+.claude/
+.cursor/
+.devin/
+update-controllers.js
+update-docker.js
+update-schema.js
+server/test.js
+
+# ==========================================
+# Test Coverage
+# ==========================================
+coverage/
+.nyc_output/

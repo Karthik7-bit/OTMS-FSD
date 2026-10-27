@@ -1,0 +1,12 @@
+{
+  "name": "organ-transplant-management",
+  "version": "1.0.0",
+  "description": "Organ Transplant Management System",
+  "scripts": {
+    "start": "docker compose up --build",
+    "dev": "docker compose up",
+    "install:all": "npm run install:client && npm run install:server",
+    "install:client": "cd client && npm install",
+    "install:server": "cd server && npm install"
+  }
+}
